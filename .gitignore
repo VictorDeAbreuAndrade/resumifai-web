@@ -24,3 +24,7 @@ backend/.env
 *.njsproj
 *.sln
 *.sw?
+
+# Local .bat files
+node.bat
+npm.bat
