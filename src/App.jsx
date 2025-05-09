@@ -5,9 +5,11 @@ export default function App() {
   return (
     <>
       <Header>
-        <h1>R<span className='text-6xl'>ESUMIF</span>AI</h1>
+        <img
+          src='../src/assets/ResumifAiLogo.png'
+          alt="Teste"
+        />
       </Header>
-
       <Main/>
     </>
   )

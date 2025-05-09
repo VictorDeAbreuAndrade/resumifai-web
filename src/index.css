@@ -16,3 +16,7 @@
 
   background-color: rgb(17, 11, 44);
 }
+
+input[type="radio"]:checked + span {
+  @apply bg-gray-800 ring-2 ring-gray-400;
+}

@@ -8,84 +8,130 @@ export function Main() {
 	const backEndUrl = import.meta.env.VITE_SERVER_URL
 	const [idDetected, setIdDetected] = useState('')
 	const [summary, setSummary] = useState('Your summary will be displayed here')
+	const [selectedWordLimit, setSelectedWordLimit] = useState('200')
 
-	function handleChange (event) {
+	const handleChange = (event) => {
 		let videoId = urlValidate(event.target.value)
 		setIdDetected(videoId)
   	}
 
-	async function handleButtonResumirClicked () {
+	const handleButtonResumirClicked = async () => {
+
+		console.log('ID detected:', idDetected)
 
 		try {
 
 			setSummary('Fetching transcription...')
 			const transcriptionResponse = await axios.get(`${backEndUrl}/transcription/${idDetected}`)
 
+			console.log('chegou aqui')
+
 			setSummary('Generating summary...')
-			const summaryResponse = await axios.post(`${backEndUrl}/summary/${idDetected}`,
+			const summaryResponse = await axios.post(`${backEndUrl}/summary/${selectedWordLimit}`,
 				{
-					transcription: transcriptionResponse.data.transcription
+					transcription: transcriptionResponse.data.transcription,
+					wordLimit: selectedWordLimit
 				})
 
+			// setSummary(summaryResponse)
 			setSummary(summaryResponse.data.summary)
 
 		} catch (error) {
-			setSummary(console.error(error))
+			console.error('Full error object:', error)
+			console.error('Response data:', error.response?.data)
+			console.error('Response status:', error.response?.status)
+			setSummary(`Error: ${error.response?.data?.message || error.message}`)
 		}
 
 	}
 
-	function handleButtonLimparClicked () {
+	const handleButtonLimparClicked = () => {
 		window.location.reload()
+	}
+
+	const urlValidate = async url => {
+		// console.log('URL tested:', url);
+
+		let idDetected = 'Invalid ID!';
+
+		// Check if URL is from Youtube and collect its ID
+		if (url.includes('https://www.youtube.com/watch?v=')) {
+		  idDetected = url.split(/watch\?v=|&/)[1];
+		  idDetected.length === 11 ? null : (idDetected = 'Invalid ID!');
+		} else if (url.includes('https://youtu.be/')) {
+		  idDetected = url.split(/youtu.be\/|\?/)[1];
+		  idDetected.length === 11 ? null : (idDetected = 'Invalid ID!');
+		} else if (url.includes('https://www.youtube.com/live/')) {
+		  // Insert here the possibility to recognize live links
+		  idDetected = url.split(/live\/|\?/)[1];
+		  idDetected.length === 11 ? null : (idDetected = 'Invalid ID!');
+		}
+
+		// console.log(`Video ID: ${idDetected}`);
+
+		return idDetected;
 	}
 
 	return (
 		<>
-			<div className="p-2 text-center space-x-4 m-2">
+			<div className="p-2 max-w-xl mx-auto m-2">
 
-				<div className='flex items-center space-x-3'>
+				<div className='items-center'>
 
-					<input type="url" name="urlVideo" id="urlVideo" placeholder='Paste here the video URL' className="align-middle text-black p-2 w-2/3 h-10 border shadow-md" onChange={handleChange}/>
-					<button className="p-2 w-1/6 shadow-md bg-gray-600 hover:bg-gray-700" onClick={handleButtonResumirClicked}>ResumifAI</button>
-					<button className="p-2 w-1/6 shadow-md bg-gray-500 hover:bg-gray-700" onClick={handleButtonLimparClicked}>Reset</button>
+					<input type="url" name="urlVideo" id="urlVideo" placeholder='Paste here the video URL' className="align-middle text-black p-2 mb-3 h-10 w-full border shadow-md" onChange={handleChange}/>
+				</div>
+
+				<div className='flex items-center gap-2'>
+
+					<button className="p-2 w-1/2 rounded-lg shadow-md bg-gray-600 hover:bg-gray-700" onClick={handleButtonResumirClicked}>ResumifAI</button>
+					<button className="p-2 w-1/2 rounded-lg shadow-md bg-gray-500 hover:bg-gray-700" onClick={handleButtonLimparClicked}>Reset</button>
 
 				</div>
 
 				<div className="space-x-4 mt-3 text-sm text-center">
-					<input type="radio" name="qtdWords" id="qt200" value="200words" defaultChecked /> 200 words
-					<input type="radio" name="qtdWords" id="qt300" value="300words" /> 300 words
-					<input type="radio" name="qtdWords" id="qtdNo" value="noLimits" /> No limit of words
-					<span className="space-x-2">
-						<input type="radio" name="qtdWords" id="qtdPersonalized" value="personalized" /> Other quantity (50-9999):
-						<input className="h-8 p-1 w-14 border shadow-md text-black" type="number" name="qtdChosen" id="qtdChosen" min="50" max="9999" />
-					</span>
+					<span className='text-base'>Number of words:</span>
+					<label className='cursor-pointer'>
+						<input type="radio" name="qtdWords"
+						className='hidden'
+						checked={selectedWordLimit == '200'}
+						onChange={() => setSelectedWordLimit('200')} />
+						<span className='px-3 py-1.5 rounded-lg bg-gray-700 transition-colors'>
+							200
+						</span>
+					</label>
+
+					<label className='cursor-pointer'>
+						<input type="radio" name="qtdWord"
+						className='hidden'
+						checked={selectedWordLimit == '400'}
+						onChange={() => setSelectedWordLimit('400')} />
+						<span className='px-3 py-1.5 rounded-lg bg-gray-700 transition-colors'>
+							400
+						</span>
+					</label>
+
+					<label className='cursor-pointer'>
+						<input type="radio" name="qtdWords"
+						className='hidden'
+						checked={selectedWordLimit == 'noLimits'}
+						onChange={() => setSelectedWordLimit('noLimits')} />
+						<span className='px-3 py-1.5 rounded-lg bg-gray-700 transition-colors'>
+							Unlimited
+						</span>
+					</label>
+
 				</div>
 
+				<div className="flex justify-center space-x-4 mt-3">
+
+					<span className="flex space-x-2 items-center">
+						<input type="radio" name="qtdWords" id="qtdPersonalized" value="personalized" className='hidden' /> Custom quantity (25-9999):
+						<input className="h-8 p-1 w-14 border shadow-md text-black" type="number" name="qtdChosen" id="qtdChosen" min="25" max="9999" />
+					</span>
+				</div>
 			</div>
 		<Output answerAI={summary} />
 		{idDetected == 'Invalid ID!' ? (<div className='absolute top-1 left-1 border border-red-600 p-1 text-sm font-semibold text-red-600 bg-red-300'>Insert a valid URL!</div>) : ''}
     </>
   )
-}
-
-function urlValidate(url) {
-
-	let idDetected = 'Invalid ID!'
-
-	// Check if URL is from Youtube and collect its ID
-	if (url.includes('https://www.youtube.com/watch?v=')) {
-		idDetected = url.split(/watch\?v=|&/)[1]
-		idDetected.length == 11 ? null : idDetected = 'Invalid ID!'
-	} else if (url.includes('https://youtu.be/')) {
-		idDetected = url.split(/youtu.be\/|\?/)[1]
-		idDetected.length == 11 ? null : idDetected = 'Invalid ID!'
-	} else if (url == '') {	//Colocar aqui o possibilidade de dectectar links de lives
-		idDetected = ''
-	} else if (url == '') {
-		idDetected = ''
-	}
-
-	console.log(`Video ID: ${idDetected}`)
-
-	return idDetected
 }
