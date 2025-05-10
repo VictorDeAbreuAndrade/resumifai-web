@@ -1,11 +1,11 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 import axios from 'axios'
 import { useState } from 'react'
-import Output from './Output'
 
 export function Main() {
 
 	const backEndUrl = import.meta.env.VITE_SERVER_URL
+	console.log('BackEnd URL:', backEndUrl)
 	const [idDetected, setIdDetected] = useState('')
 	const [summary, setSummary] = useState('Your summary will be displayed here')
 	const [selectedWordLimit, setSelectedWordLimit] = useState('200')
@@ -24,10 +24,8 @@ export function Main() {
 			setSummary('Fetching transcription...')
 			const transcriptionResponse = await axios.get(`${backEndUrl}/transcription/${idDetected}`)
 
-			console.log('chegou aqui')
-
 			setSummary('Generating summary...')
-			const summaryResponse = await axios.post(`${backEndUrl}/summary/${selectedWordLimit}`,
+			const summaryResponse = await axios.post(`${backEndUrl}/summary`,
 				{
 					transcription: transcriptionResponse.data.transcription,
 					wordLimit: selectedWordLimit
@@ -49,7 +47,7 @@ export function Main() {
 		window.location.reload()
 	}
 
-	const urlValidate = async url => {
+	const urlValidate = (url) => {
 		// console.log('URL tested:', url);
 
 		let idDetected = 'Invalid ID!';
@@ -62,12 +60,15 @@ export function Main() {
 		  idDetected = url.split(/youtu.be\/|\?/)[1];
 		  idDetected.length === 11 ? null : (idDetected = 'Invalid ID!');
 		} else if (url.includes('https://www.youtube.com/live/')) {
-		  // Insert here the possibility to recognize live links
 		  idDetected = url.split(/live\/|\?/)[1];
+		  idDetected.length === 11 ? null : (idDetected = 'Invalid ID!');
+		} else if (url.includes('https://youtube.com/shorts/')) {
+		  // Insert here the possibility to recognize shorts links
+		  idDetected = url.split(/shorts\/|\?/)[1];
 		  idDetected.length === 11 ? null : (idDetected = 'Invalid ID!');
 		}
 
-		// console.log(`Video ID: ${idDetected}`);
+		console.log(`Video ID: ${idDetected}`);
 
 		return idDetected;
 	}
@@ -130,7 +131,9 @@ export function Main() {
 					</span>
 				</div>
 			</div>
-		<Output answerAI={summary} />
+			<div className="min-h-fit p-2 px-3 m-4 bg-neutral-900 flex text-justify">
+      			{summary}
+    		</div>
 		{idDetected == 'Invalid ID!' ? (<div className='absolute top-1 left-1 border border-red-600 p-1 text-sm font-semibold text-red-600 bg-red-300'>Insert a valid URL!</div>) : ''}
     </>
   )
