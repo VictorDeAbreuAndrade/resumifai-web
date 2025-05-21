@@ -7,7 +7,7 @@ export default function Home() {
     <>
       <Header>
         <Image
-          src="/ResumifAiLogo.png"
+          src="./ResumifAiLogo.png"
           alt="Resumif AI logo"
           width={450}
           height={38}
