@@ -4,7 +4,6 @@ import { useState } from "react";
 
 export function Main() {
   const backEndUrl = process.env.NEXT_PUBLIC_SERVER_URL;
-  console.log("BackEnd URL:", backEndUrl);
   const [idDetected, setIdDetected] = useState("");
   const [summary, setSummary] = useState("Your summary will be displayed here");
   const [selectedWordLimit, setSelectedWordLimit] = useState("200");
