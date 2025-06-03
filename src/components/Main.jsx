@@ -6,34 +6,50 @@ export function Main() {
   const backEndUrl = process.env.NEXT_PUBLIC_SERVER_URL;
   const [idDetected, setIdDetected] = useState("");
   const [summary, setSummary] = useState("Your summary will be displayed here");
-  const [selectedWordLimit, setSelectedWordLimit] = useState("200");
+  const [selectedWordLimit, setSelectedWordLimit] = useState("100");
 
   const handleChange = (event) => {
     let videoId = urlValidate(event.target.value);
     setIdDetected(videoId);
   };
 
-  const handleButtonResumirClicked = async () => {
-    console.log("ID detected:", idDetected);
+  const handleButtonPasteAndGoClicked = async () => {
+    const inputText = document.getElementById("urlVideo");
 
     try {
-      // setSummary('Fetching transcription...')
-      // const transcriptionResponse = await axios.get(`${backEndUrl}/transcription/${idDetected}`)
+      // Check if the Clipboard API is supported
+      if (!navigator.clipboard) {
+        alert("Clipboard API not supported in this browser.");
+        return;
+      }
 
+      const copiedUrl = await navigator.clipboard.readText();
+      inputText.value = copiedUrl;
+      const videoId = urlValidate(copiedUrl);
+      setIdDetected(videoId);
+      console.log("Video ID from clipboard:", videoId);
+      handleButtonResumirClicked(videoId);
+    } catch (error) {
+      console.error("Error reading from clipboard:", error);
+      alert("Failed to read from clipboard. Please paste the URL manually.");
+      inputText.value = "";
+      setIdDetected("");
+      setSummary("Your summary will be displayed here");
+    }
+  };
+
+  const handleButtonResumirClicked = async (videoId) => {
+    console.log("ID detected:", idDetected);
+    console.log("ID param:", videoId);
+
+    try {
       setSummary("Generating summary...");
 
-      // const summaryResponse = await axios.post(`${backEndUrl}/summary`,
-      // 	{
-      // 		transcription: transcriptionResponse.data.transcription,
-      // 		wordLimit: selectedWordLimit
-      // 	})
-
       const summaryResponse = await axios.post(`${backEndUrl}/`, {
-        videoId: idDetected,
+        videoId: videoId || idDetected,
         wordLimit: selectedWordLimit,
       });
 
-      // setSummary(summaryResponse)
       setSummary(summaryResponse.data.summary);
     } catch (error) {
       console.error("Full error object:", error);
@@ -68,7 +84,7 @@ export function Main() {
       idDetected.length === 11 ? null : (idDetected = "Invalid ID!");
     }
 
-    console.log(`Video ID: ${idDetected}`);
+    // console.log(`Video ID: ${idDetected}`);
 
     return idDetected;
   };
@@ -76,15 +92,21 @@ export function Main() {
   return (
     <>
       <div className="p-4 max-w-xl mx-auto m-2">
-        <div className="items-center">
+        <div className="relative items-center">
           <input
             type="url"
             name="urlVideo"
             id="urlVideo"
             placeholder="Paste here the video URL"
-            className="align-middle bg-white text-black p-2 mb-3 h-10 w-full border shadow-md"
+            className="align-middle bg-white text-black p-2 pr-28 mb-3 h-10 w-full border shadow-md"
             onChange={handleChange}
           />
+          <button
+            className="absolute right-1 top-1 rounded-lg w-25 h-8 shadow-md bg-gray-600 hover:bg-gray-700"
+            onClick={handleButtonPasteAndGoClicked}
+          >
+            Paste'n'Go
+          </button>
         </div>
 
         <div className="flex items-center gap-2">
@@ -109,6 +131,25 @@ export function Main() {
               type="radio"
               name="qtdWords"
               className="hidden"
+              checked={selectedWordLimit == "100"}
+              onChange={() => setSelectedWordLimit("100")}
+            />
+            <span
+              className={`px-3 py-1.5 rounded-lg transition-colors ${
+                selectedWordLimit == "100"
+                  ? "bg-gray-900 border border-white"
+                  : "bg-gray-700"
+              }`}
+            >
+              100
+            </span>
+          </label>
+
+          <label className="cursor-pointer">
+            <input
+              type="radio"
+              name="qtdWords"
+              className="hidden"
               checked={selectedWordLimit == "200"}
               onChange={() => setSelectedWordLimit("200")}
             />
@@ -120,25 +161,6 @@ export function Main() {
               }`}
             >
               200
-            </span>
-          </label>
-
-          <label className="cursor-pointer">
-            <input
-              type="radio"
-              name="qtdWords"
-              className="hidden"
-              checked={selectedWordLimit == "400"}
-              onChange={() => setSelectedWordLimit("400")}
-            />
-            <span
-              className={`px-3 py-1.5 rounded-lg transition-colors ${
-                selectedWordLimit == "400"
-                  ? "bg-gray-900 border border-white"
-                  : "bg-gray-700"
-              }`}
-            >
-              400
             </span>
           </label>
 
@@ -200,7 +222,7 @@ export function Main() {
           </span>
         </div>
       </div>
-      <div className="min-h-fit p-2 px-3 m-4 bg-neutral-900 flex text-justify">
+      <div className="min-h-fit p-2 px-3 max-w-135 mx-auto m-4 bg-neutral-900 flex text-justify">
         {summary}
       </div>
       {idDetected == "Invalid ID!" ? (
