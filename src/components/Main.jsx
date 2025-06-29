@@ -222,7 +222,7 @@ export function Main() {
           </span>
         </div>
       </div>
-      <div className="min-h-fit p-2 px-3 max-w-135 mx-auto m-4 bg-neutral-900 flex text-justify">
+      <div className="min-h-fit p-2 px-3 max-w-135 mx-auto m-4 bg-neutral-900 flex text-justify text-white">
         {summary}
       </div>
       {idDetected == "Invalid ID!" ? (

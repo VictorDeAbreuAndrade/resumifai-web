@@ -41,7 +41,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className="bg-[#110b2c]">
       <head>
         <link rel="icon" href="/ResumifAiIcon.png" type="image/png" />
       </head>
