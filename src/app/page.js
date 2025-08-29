@@ -12,8 +12,11 @@ export default function Home() {
           width={450}
           height={38}
           priority
-          />
+        />
       </Header>
+      <div className="mt-4 italic text-center text-sm text-blue-300 text-shadow-[3px_4px_3.4px] text-shadow-blue-700">
+        Summarize YouTube videos in seconds!
+      </div>
       <Main />
     </>
   );

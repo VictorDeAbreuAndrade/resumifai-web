@@ -92,7 +92,7 @@ export function Main() {
 
   return (
     <>
-      <div className="p-4 max-w-xl mx-auto m-2">
+      <div className="p-2.5 max-w-xl mx-auto m-2">
         <div className="relative items-center">
           <input
             type="url"
