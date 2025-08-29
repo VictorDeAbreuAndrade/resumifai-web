@@ -39,14 +39,15 @@ export function Main() {
   };
 
   const handleButtonResumirClicked = async (videoId) => {
-    console.log("ID detected:", idDetected);
+    const idToUse = videoId || idDetected;
+    console.log("ID to use:", idToUse);
     console.log("ID param:", videoId);
 
     try {
       setSummary("Generating summary...");
 
       const summaryResponse = await axios.post(`${backEndUrl}/`, {
-        videoId: videoId || idDetected,
+        videoId: idToUse,
         wordLimit: selectedWordLimit,
       });
 
@@ -112,7 +113,7 @@ export function Main() {
         <div className="flex items-center gap-2">
           <button
             className="p-2 w-1/2 rounded-lg shadow-md bg-gray-600 hover:bg-gray-700"
-            onClick={handleButtonResumirClicked}
+            onClick={() => handleButtonResumirClicked()}
           >
             ResumifAI
           </button>
