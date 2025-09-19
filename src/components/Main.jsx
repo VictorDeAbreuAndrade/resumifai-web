@@ -72,7 +72,7 @@ export function Main() {
     }
     try {
       await navigator.clipboard.writeText(
-        `"${summary.trim()}"\n\nSummarized with ResumifAI - tinyurl.com/resumifai`
+        `"${summary.trim()}"\n\nSummarized with ResumifAI - https://tinyurl.com/resumifai`
       );
       setCopyButtonText("Copied!");
       setTimeout(() => {
