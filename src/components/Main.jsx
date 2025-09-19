@@ -72,7 +72,7 @@ export function Main() {
     }
     try {
       await navigator.clipboard.writeText(
-        `"${summary}"\nSummarized with ResumifAI - tinyurl.com/resumifai`
+        `"${summary.trim()}"\n\nSummarized with ResumifAI - tinyurl.com/resumifai`
       );
       setCopyButtonText("Copied!");
       setTimeout(() => {
@@ -255,8 +255,8 @@ export function Main() {
             onClick={handleCopySummary}
             className={`absolute top-0.5 right-0.5 p-1.5 rounded-lg transition-all opacity-30 hover:opacity-70 ${
               copyButtonText === "Copied!"
-                ? "opacity-100"
-                : "hover:opacity-70"
+                ? "active:scale-70"
+                : ""
             }`}
             title="Copy summary"
           >
