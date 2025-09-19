@@ -247,13 +247,14 @@ export function Main() {
           </span>
         </div>
       </div>
-      <div className="relative min-h-fit p-2 px-3 max-w-135 mx-auto m-4 bg-neutral-900 flex text-justify text-white">
+      <div className="flex items-start min-h-fit p-2 px-3 max-w-135 mx-auto m-4 bg-neutral-900 text-justify text-white">
+        <span className="flex-grow">{summary}
         {
         isSummaryAvailable &&
         (
           <button
             onClick={handleCopySummary}
-            className={`absolute top-0.5 right-0.5 p-1.5 rounded-lg transition-all opacity-30 hover:opacity-70 ${
+            className={`px-1 transition-all opacity-30 hover:opacity-70 ${
               copyButtonText === "Copied!"
                 ? "scale-70"
                 : ""
@@ -263,12 +264,12 @@ export function Main() {
             <Image
               src={copyButton}
               alt={copyButtonText}
-              width={20}
-              height={20}
+              width={17}
+              height={17}
             />
           </button>
         )}
-        {summary}
+        </span>
       </div>
       {idDetected == "Invalid ID!" ? (
         <div className="absolute top-1 left-1 border border-red-600 p-1 text-sm font-semibold text-red-600 bg-red-300">
