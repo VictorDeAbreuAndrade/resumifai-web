@@ -77,7 +77,7 @@ export function Main() {
       setCopyButtonText("Copied!");
       setTimeout(() => {
         setCopyButtonText("Copy");
-      }, 250); // Reset button text after 2 seconds
+      }, 100); // Reset button text after 2 seconds
     } catch (err) {
       console.error("Failed to copy text: ", err);
       setCopyButtonText("Failed!");
