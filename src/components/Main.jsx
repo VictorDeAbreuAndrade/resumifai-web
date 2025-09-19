@@ -77,7 +77,7 @@ export function Main() {
       setCopyButtonText("Copied!");
       setTimeout(() => {
         setCopyButtonText("Copy");
-      }, 2000); // Reset button text after 2 seconds
+      }, 500); // Reset button text after 2 seconds
     } catch (err) {
       console.error("Failed to copy text: ", err);
       setCopyButtonText("Failed!");
@@ -249,13 +249,13 @@ export function Main() {
       </div>
       <div className="relative min-h-fit p-2 px-3 max-w-135 mx-auto m-4 bg-neutral-900 flex text-justify text-white">
         {
-        isSummaryAvailable &&
+        // isSummaryAvailable &&
         (
           <button
             onClick={handleCopySummary}
             className={`absolute top-0.5 right-0.5 p-1.5 rounded-lg transition-all opacity-30 hover:opacity-70 ${
               copyButtonText === "Copied!"
-                ? "active:scale-70"
+                ? "scale-70"
                 : ""
             }`}
             title="Copy summary"
