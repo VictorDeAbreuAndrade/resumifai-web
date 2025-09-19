@@ -1,12 +1,15 @@
 "use client";
 import axios from "axios";
+import Image from "next/image";
 import { useState } from "react";
+import copyButton from "../../public/copyIcon.png";
 
 export function Main() {
   const backEndUrl = process.env.NEXT_PUBLIC_SERVER_URL;
   const [idDetected, setIdDetected] = useState("");
   const [summary, setSummary] = useState("Your summary will be displayed here");
   const [selectedWordLimit, setSelectedWordLimit] = useState("100");
+  const [copyButtonText, setCopyButtonText] = useState("Copy");
 
   const handleChange = (event) => {
     let videoId = urlValidate(event.target.value);
@@ -17,7 +20,6 @@ export function Main() {
     const inputText = document.getElementById("urlVideo");
 
     try {
-      // Check if the Clipboard API is supported
       if (!navigator.clipboard) {
         alert("Clipboard API not supported in this browser.");
         return;
@@ -27,7 +29,6 @@ export function Main() {
       inputText.value = copiedUrl;
       const videoId = urlValidate(copiedUrl);
       setIdDetected(videoId);
-      console.log("Video ID from clipboard:", videoId);
       handleButtonResumirClicked(videoId);
     } catch (error) {
       console.error("Error reading from clipboard:", error);
@@ -40,8 +41,6 @@ export function Main() {
 
   const handleButtonResumirClicked = async (videoId) => {
     const idToUse = videoId || idDetected;
-    console.log("ID to use:", idToUse);
-    console.log("ID param:", videoId);
 
     try {
       setSummary("Generating summary...");
@@ -54,8 +53,6 @@ export function Main() {
       setSummary(summaryResponse.data.summary);
     } catch (error) {
       console.error("Full error object:", error);
-      console.error("Response data:", error.response?.data);
-      console.error("Response status:", error.response?.status);
       setSummary(`Error: ${error.response?.data?.message || error.message}`);
     }
   };
@@ -64,9 +61,33 @@ export function Main() {
     window.location.reload();
   };
 
-  const urlValidate = (url) => {
-    // console.log('URL tested:', url);
+  const handleCopySummary = async () => {
+    if (
+      !summary ||
+      summary === "Your summary will be displayed here" ||
+      summary.startsWith("Error:") ||
+      summary.startsWith("Generating summary...")
+    ) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(
+        `"${summary}"\nSummarized with ResumifAI - tinyurl.com/resumifai`
+      );
+      setCopyButtonText("Copied!");
+      setTimeout(() => {
+        setCopyButtonText("Copy");
+      }, 2000); // Reset button text after 2 seconds
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+      setCopyButtonText("Failed!");
+      setTimeout(() => {
+        setCopyButtonText("Copy");
+      }, 2000);
+    }
+  };
 
+  const urlValidate = (url) => {
     let idDetected = "Invalid ID!";
 
     // Check if URL is from Youtube and collect its ID
@@ -80,15 +101,18 @@ export function Main() {
       idDetected = url.split(/live\/|\?/)[1];
       idDetected.length === 11 ? null : (idDetected = "Invalid ID!");
     } else if (url.includes("https://youtube.com/shorts/")) {
-      // Insert here the possibility to recognize shorts links
       idDetected = url.split(/shorts\/|\?/)[1];
       idDetected.length === 11 ? null : (idDetected = "Invalid ID!");
     }
 
-    // console.log(`Video ID: ${idDetected}`);
-
     return idDetected;
   };
+
+  const isSummaryAvailable =
+    summary &&
+    summary !== "Your summary will be displayed here" &&
+    !summary.startsWith("Generating summary...") &&
+    !summary.startsWith("Error:");
 
   return (
     <>
@@ -223,7 +247,27 @@ export function Main() {
           </span>
         </div>
       </div>
-      <div className="min-h-fit p-2 px-3 max-w-135 mx-auto m-4 bg-neutral-900 flex text-justify text-white">
+      <div className="relative min-h-fit p-2 px-3 max-w-135 mx-auto m-4 bg-neutral-900 flex text-justify text-white">
+        {
+        isSummaryAvailable &&
+        (
+          <button
+            onClick={handleCopySummary}
+            className={`absolute top-0.5 right-0.5 p-1.5 rounded-lg transition-all opacity-30 hover:opacity-70 ${
+              copyButtonText === "Copied!"
+                ? "opacity-100"
+                : "hover:opacity-70"
+            }`}
+            title="Copy summary"
+          >
+            <Image
+              src={copyButton}
+              alt={copyButtonText}
+              width={20}
+              height={20}
+            />
+          </button>
+        )}
         {summary}
       </div>
       {idDetected == "Invalid ID!" ? (
