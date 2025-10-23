@@ -7,8 +7,9 @@ import copyButton from "../../public/copyIcon.png";
 export function Main() {
   const backEndUrl = process.env.NEXT_PUBLIC_SERVER_URL;
   const [idDetected, setIdDetected] = useState("");
-  const [summary, setSummary] = useState("Your summary will be displayed here");
+  const [stepByStepMode, setStepByStepMode] = useState(false);
   const [selectedWordLimit, setSelectedWordLimit] = useState("100");
+  const [summary, setSummary] = useState("Your summary will be displayed here");
   const [copyButtonText, setCopyButtonText] = useState("Copy");
 
   const handleChange = (event) => {
@@ -47,6 +48,7 @@ export function Main() {
 
       const summaryResponse = await axios.post(`${backEndUrl}/`, {
         videoId: idToUse,
+        stepByStep: stepByStepMode,
         wordLimit: selectedWordLimit,
       });
 
@@ -57,8 +59,8 @@ export function Main() {
     }
   };
 
-  const handleButtonLimparClicked = () => {
-    window.location.reload();
+  const handleResetClicked = () => {
+    window.location.reload(); // Or reset states: setIdDetected(''), setSummary(...) etc.
   };
 
   const handleCopySummary = async () => {
@@ -142,8 +144,19 @@ export function Main() {
             ResumifAI
           </button>
           <button
-            className="p-2 w-1/2 rounded-lg shadow-md bg-gray-500 hover:bg-gray-700"
-            onClick={handleButtonLimparClicked}
+            // className={`p-2 w-1/2 rounded-lg shadow-md bg-gray-500 hover:bg-gray-700`}
+            className={`p-2 w-1/2 rounded-lg hover:bg-gray-700 transition-colors ${
+              stepByStepMode == true
+                ? "bg-gray-900 border border-white"
+                : "bg-gray-500"
+            }`}
+            onClick={() => setStepByStepMode(!stepByStepMode)}
+          >
+            Step-By-Step Mode
+          </button>
+          <button
+            className="p-2 w-1/2 rounded-lg shadow-md bg-gray-600 hover:bg-gray-700"
+            onClick={handleResetClicked}
           >
             Reset
           </button>
@@ -248,27 +261,24 @@ export function Main() {
         </div>
       </div>
       <div className="flex items-start min-h-fit p-2 px-3 max-w-135 mx-auto m-4 bg-neutral-900 text-justify text-white">
-        <span className="flex-grow">{summary}
-        {
-        isSummaryAvailable &&
-        (
-          <button
-            onClick={handleCopySummary}
-            className={`px-1 transition-all opacity-30 hover:opacity-70 ${
-              copyButtonText === "Copied!"
-                ? "scale-70"
-                : ""
-            }`}
-            title="Copy summary"
-          >
-            <Image
-              src={copyButton}
-              alt={copyButtonText}
-              width={17}
-              height={17}
-            />
-          </button>
-        )}
+        <span className="flex-grow">
+          {summary}
+          {isSummaryAvailable && (
+            <button
+              onClick={handleCopySummary}
+              className={`px-1 transition-all opacity-30 hover:opacity-70 ${
+                copyButtonText === "Copied!" ? "scale-70" : ""
+              }`}
+              title="Copy summary"
+            >
+              <Image
+                src={copyButton}
+                alt={copyButtonText}
+                width={17}
+                height={17}
+              />
+            </button>
+          )}
         </span>
       </div>
       {idDetected == "Invalid ID!" ? (
