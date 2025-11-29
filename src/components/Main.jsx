@@ -138,11 +138,14 @@ export function Main() {
 
         <div className="flex items-center gap-2">
           <button
-            className="p-2 w-1/2 rounded-lg shadow-md bg-gray-600 hover:bg-gray-700"
+            className="p-2 w-full rounded-lg shadow-md bg-gray-600 hover:bg-gray-700"
             onClick={() => handleButtonResumirClicked()}
           >
             ResumifAI
           </button>
+
+        </div>
+        <div className="flex items-center my-2 gap-2">
           <button
             // className={`p-2 w-1/2 rounded-lg shadow-md bg-gray-500 hover:bg-gray-700`}
             className={`p-2 w-1/2 rounded-lg hover:bg-gray-700 transition-colors ${
@@ -155,7 +158,7 @@ export function Main() {
             Step-By-Step Mode
           </button>
           <button
-            className="p-2 w-1/2 rounded-lg shadow-md bg-gray-600 hover:bg-gray-700"
+            className="p-2 w-1/2 rounded-lg shadow-md bg-gray-500 hover:bg-gray-700"
             onClick={handleResetClicked}
           >
             Reset
