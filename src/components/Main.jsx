@@ -7,14 +7,16 @@ import copyButton from "../../public/copyIcon.png";
 export function Main() {
   const backEndUrl = process.env.NEXT_PUBLIC_SERVER_URL;
   const [idDetected, setIdDetected] = useState("");
-  const [stepByStepMode, setStepByStepMode] = useState(false);
+  const [mode, setMode] = useState('default')
   const [selectedWordLimit, setSelectedWordLimit] = useState("100");
   const [summary, setSummary] = useState("Your summary will be displayed here");
   const [copyButtonText, setCopyButtonText] = useState("Copy");
+  let url = '';
 
   const handleChange = (event) => {
     let videoId = urlValidate(event.target.value);
     setIdDetected(videoId);
+    url = event.target.value;
   };
 
   const handleButtonPasteAndGoClicked = async () => {
@@ -48,7 +50,8 @@ export function Main() {
 
       const summaryResponse = await axios.post(`${backEndUrl}/`, {
         videoId: idToUse,
-        stepByStep: stepByStepMode,
+        url: url,
+        mode: mode,
         wordLimit: selectedWordLimit,
       });
 
@@ -105,7 +108,13 @@ export function Main() {
     } else if (url.includes("https://youtube.com/shorts/")) {
       idDetected = url.split(/shorts\/|\?/)[1];
       idDetected.length === 11 ? null : (idDetected = "Invalid ID!");
-    }
+    } else if (url.includes('tiktok.com/@') && url.includes('/video/')) {
+      idDetected = url.split('/video/')[1].split('?')[0];
+      idDetected = /^[0-9]{17,19}$/.test(idDetected) ? idDetected : "Invalid ID!";
+    } else if (url.includes('vm.tiktok.com') || url.includes('vt.tiktok.com')) {
+      const testValidUrl = /(vm|vt)\.tiktok\.com\/[0-9A-Za-z]{9}\/?$/.test(url);
+      idDetected = testValidUrl ? "Valid ID!" : "Invalid ID!";
+  }
 
     return idDetected;
   };
@@ -149,16 +158,26 @@ export function Main() {
           <button
             // className={`p-2 w-1/2 rounded-lg shadow-md bg-gray-500 hover:bg-gray-700`}
             className={`p-2 w-1/2 rounded-lg hover:bg-gray-700 transition-colors ${
-              stepByStepMode == true
+              mode == 'StepByStep'
                 ? "bg-gray-900 border border-white"
                 : "bg-gray-500"
             }`}
-            onClick={() => setStepByStepMode(!stepByStepMode)}
+            onClick={() => setMode('StepByStep')}
           >
             Step-By-Step Mode
           </button>
           <button
-            className="p-2 w-1/2 rounded-lg shadow-md bg-gray-500 hover:bg-gray-700"
+            className={`p-2 w-1/3 rounded-lg hover:bg-gray-700 transition-colors ${
+              mode == 'script'
+                ? "bg-gray-900 border border-white"
+                : "bg-gray-500"
+            }`}
+            onClick={() => setMode('script')}
+          >
+            Script Mode
+          </button>
+          <button
+            className="p-2 w-1/5 rounded-lg shadow-md bg-gray-500 hover:bg-gray-700"
             onClick={handleResetClicked}
           >
             Reset
