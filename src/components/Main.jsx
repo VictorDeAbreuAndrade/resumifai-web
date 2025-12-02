@@ -7,16 +7,17 @@ import copyButton from "../../public/copyIcon.png";
 export function Main() {
   const backEndUrl = process.env.NEXT_PUBLIC_SERVER_URL;
   const [idDetected, setIdDetected] = useState("");
+  const [urlUsed, setUrlUsed] = useState("");
   const [mode, setMode] = useState('default')
   const [selectedWordLimit, setSelectedWordLimit] = useState("100");
   const [summary, setSummary] = useState("Your summary will be displayed here");
   const [copyButtonText, setCopyButtonText] = useState("Copy");
-  let url = '';
 
   const handleChange = (event) => {
     let videoId = urlValidate(event.target.value);
     setIdDetected(videoId);
-    url = event.target.value;
+    const url = event.target.value;
+    setUrlUsed(url);
   };
 
   const handleButtonPasteAndGoClicked = async () => {
@@ -48,9 +49,14 @@ export function Main() {
     try {
       setSummary("Generating summary...");
 
+      console.log('Video ID:', idToUse);
+      console.log('Video URL:', urlUsed);
+      console.log('Mode:', mode);
+      console.log('Selected Word Limit:', selectedWordLimit);
+
       const summaryResponse = await axios.post(`${backEndUrl}/`, {
         videoId: idToUse,
-        url: url,
+        url: urlUsed,
         mode: mode,
         wordLimit: selectedWordLimit,
       });
@@ -156,7 +162,6 @@ export function Main() {
         </div>
         <div className="flex items-center my-2 gap-2">
           <button
-            // className={`p-2 w-1/2 rounded-lg shadow-md bg-gray-500 hover:bg-gray-700`}
             className={`p-2 w-1/2 rounded-lg hover:bg-gray-700 transition-colors ${
               mode == 'StepByStep'
                 ? "bg-gray-900 border border-white"
