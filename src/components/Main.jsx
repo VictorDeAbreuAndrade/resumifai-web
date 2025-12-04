@@ -13,11 +13,19 @@ export function Main() {
   const [summary, setSummary] = useState("Your summary will be displayed here");
   const [copyButtonText, setCopyButtonText] = useState("Copy");
 
-  const handleChange = (event) => {
-    let videoId = urlValidate(event.target.value);
-    setIdDetected(videoId);
-    const url = event.target.value;
-    setUrlUsed(url);
+  const handleChange = async (event) => {
+
+    try {
+
+      let videoId = await urlValidate(event.target.value);
+      setIdDetected(videoId);
+      let copiedUrl = await event.target.value
+      setUrlUsed(copiedUrl);
+
+    } catch (error) {
+      console.error("Error reading URL:", error);
+    }
+
   };
 
   const handleButtonPasteAndGoClicked = async () => {
@@ -33,7 +41,8 @@ export function Main() {
       inputText.value = copiedUrl;
       const videoId = urlValidate(copiedUrl);
       setIdDetected(videoId);
-      handleButtonResumirClicked(videoId);
+      setUrlUsed(copiedUrl);
+      handleButtonResumirClicked(videoId, copiedUrl);
     } catch (error) {
       console.error("Error reading from clipboard:", error);
       alert("Failed to read from clipboard. Please paste the URL manually.");
@@ -43,20 +52,21 @@ export function Main() {
     }
   };
 
-  const handleButtonResumirClicked = async (videoId) => {
+  const handleButtonResumirClicked = async (videoId, url) => {
     const idToUse = videoId || idDetected;
+    const urlToUse = url || urlUsed;
 
     try {
       setSummary("Generating summary...");
 
       console.log('Video ID:', idToUse);
-      console.log('Video URL:', urlUsed);
+      console.log('Video URL:', urlToUse);
       console.log('Mode:', mode);
       console.log('Selected Word Limit:', selectedWordLimit);
 
       const summaryResponse = await axios.post(`${backEndUrl}/`, {
         videoId: idToUse,
-        url: urlUsed,
+        url: urlToUse,
         mode: mode,
         wordLimit: selectedWordLimit,
       });
